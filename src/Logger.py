@@ -36,7 +36,7 @@ class Logging:
         self.is_first_time = True
 
         # Validate path
-        if self.path.lower().endswith(".txt") not in self.path:
+        if not self.path.lower().endswith(".txt"):
             raise FileNotFoundError("File provided does not direct to a .txt file!")
 
 
@@ -64,29 +64,21 @@ class Logging:
 
     ### Logs a message inside of a text file ###
     def log(self, msg, severity: Severity):
-
         line = sys._getframe(1)
+        mode = "w" if self.is_first_time else "a"
 
         # Actual message
-        if (self.is_first_time):
-            with open(self.path, "w") as file:
-                file.write("\n" * 4)
-                file.write("=== New Run Instance ===\n")
+        with open(self.path, mode) as file:
+            if (self.is_first_time):
+                file.write("\n" * 4 + "=== New Run Instance ===\n")
+                self.is_first_time = False
 
-                file.write("-" * 26 + "\n")
-                file.write(f"[{self.get_severity(severity)}] >> Line: {line.f_lineno}\n")
-                file.write(f"-> {os.path.abspath(sys.argv[0])}\n")
-                file.write(f"# {date.today()} | {datetime.now().strftime('%I:%M %p')}\n")
-                file.write(f">> {msg}\n")
-            self.is_first_time = False
+            file.write("-" * 26 + "\n")
+            file.write(f"[{self.get_severity(severity)}] >> Line: {line.f_lineno}\n")
+            file.write(f"-> {os.path.abspath(sys.argv[0])}\n")
+            file.write(f"# {date.today()} | {datetime.now().strftime('%I:%M %p')}\n")
+            file.write(f">> {msg}\n")
 
-        else:
-            with open(self.path, "a") as file:
-                file.write("-" * 26 + "\n")
-                file.write(f"[{self.get_severity(severity)}] >> Line: {line.f_lineno}\n")
-                file.write(f"-> {os.path.abspath(sys.argv[0])}\n")
-                file.write(f"# {date.today()} | {datetime.now().strftime('%I:%M %p')}\n")
-                file.write(f">> {msg}\n")
 
         # Only if a fatal error log was called.
         if severity == Logging.Severity.FATAL:
