@@ -36,7 +36,7 @@ class Logging:
         self.is_first_time = True
 
         # Validate path
-        if ".txt" not in self.path:
+        if self.path.lower().endswith(".txt") not in self.path:
             raise FileNotFoundError("File provided does not direct to a .txt file!")
 
 
